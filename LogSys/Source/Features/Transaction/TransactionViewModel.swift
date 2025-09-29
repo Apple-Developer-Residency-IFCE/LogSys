@@ -47,17 +47,12 @@ class TransactionViewModel {
         if let logTimestamp = UserDefaults.standard.object(forKey: "logTimestamp") as? Date,
            Calendar.current.isDateInToday(logTimestamp) {
             LoggerService.shared.info("Log shared today")
+            return
         }
 
-        Task {
-            do {
-                let logData = LoggerService.shared.export() ?? Data()
-                _ = try await networkService.request(url: URL(string: "https://example.com/api/log")!, data: logData)
-                UserDefaults.standard.set(Date(), forKey: "logTimestamp")
-                LoggerService.shared.info("Log shared successfully")
-            } catch {
-                LoggerService.shared.error("Log not shared")
-            }
-        }
+        let logData = LoggerService.shared.export() ?? Data()
+        networkService.upload(url: URL(string: "https://example.com/api/log")!, data: logData)
+        UserDefaults.standard.set(Date(), forKey: "logTimestamp")
+        LoggerService.shared.info("Log shared successfully")
     }
 }

@@ -17,12 +17,12 @@ class NetworkService {
         self.session = session
     }
 
-    func request(url: URL, data: Data? = nil) async throws -> Data {
+    func upload(url: URL, data: Data? = nil) {
+        guard let data else { return }
         LoggerService.shared.info("Data request called to \(url)")
 
         var request = URLRequest(url: url)
-        request.httpBody = data
-        let (data, _) = try await session.data(for: request)
-        return data
+        request.httpMethod = "POST"
+        session.uploadTask(with: request, from: data).resume()
     }
 }
